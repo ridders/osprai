@@ -3,4 +3,6 @@
 # osprai
 Open Source Picture Review &amp; Analysis Investigator
 
-A work in progress modular open source media categoriser for Law Enforcement and supporting agencies.  
+A work in progress modular open source media categoriser for Law Enforcement and supporting agencies, developed in Python, GTK, and Glade.
+
+For those who wish to develop this project on Microsoft Windows, you will require the All-In-One PyGI/PyGObject Installer which can be obtained [here](https://sourceforge.net/projects/pygobjectwin32/files/)
