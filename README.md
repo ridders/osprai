@@ -3,6 +3,4 @@
 # osprai
 Open Source Picture Review &amp; Analysis Investigator
 
-About:
-========
 A work in progress modular open source media categoriser for Law Enforcement and supporting agencies.  
