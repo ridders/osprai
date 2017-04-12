@@ -26,3 +26,14 @@ def load_images(selection):
 				media = Image.open("{0}{1}".format(file_path, item))
 				media = media.resize((desired_width, desired_height), Image.ANTIALIAS)
 				media.save(output)
+				
+		for root, dirs, files in os.walk("temp"):
+			thumbs = files
+			return(thumbs)
+	
+	else:
+		for root, dirs, files in os.walk("temp"):
+			thumbs = files
+			return(thumbs)
+		
+		
