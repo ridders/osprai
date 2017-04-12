@@ -35,18 +35,15 @@ class image:
 
 	def on_gtk_open_activate(self, menuitem, data=None):
 		self.filechooserdialog.run()
-		#self.load_images(self.desired_width ,self.desired_height)
 	
-		
-	def on_adjustment1_changed(self, widget, scroll_type, value):
+	def on_adjustment1_changed(self, widget, *argvs):
 		self.model.clear()
-		self.desired_width = value
-		self.desired_height = value
-		print(self.desired_height)
-		print(self.desired_width)
+		#self.desired_width = value
+		#self.desired_height = value
 		
+		self.desired_width = self.adjustment.get_value()
+		self.desired_height = self.adjustment.get_value()
 		self.on_button1_clicked(self.desired_width,self.desired_height)
-		
 		
 
 	def __init__(self):
@@ -60,7 +57,6 @@ class image:
 		self.scale = self.builder.get_object('scale1')
 		self.adjustment = self.builder.get_object('adjustment1')
 		self.filechooserdialog = self.builder.get_object("filechooserdialog1")
-		
 		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
