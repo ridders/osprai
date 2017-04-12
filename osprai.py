@@ -25,19 +25,16 @@ class image:
 		self.thumb_view.set_model(self.model)
 		self.thumb_view.set_pixbuf_column(0)
 		self.thumb_view.set_columns(-1)
+
+		thumbs = folders.load_images(selection)
+		for thumbnail in thumbs:
 		
-		folders.load_images(selection)
-		#for file in files:
-			#print(file)
-		
-		#pixbuf = Pixbuf.new_from_file("{0}{1}".format(thumbs, filename))
-		#pixbuf = pixbuf.scale_simple(desired_width, desired_height, GdkPixbuf.InterpType.HYPER)
-		#self.model.append([pixbuf])
+			pixbuf = Pixbuf.new_from_file("temp/{0}".format(thumbnail))
+			pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+			self.model.append([pixbuf])
 
 	def on_gtk_open_activate(self, menuitem, data=None):
 		self.filechooserdialog.run()
-		#print self.filechooserdialog.get_filename()
-		#print self.filechooserdialog.get_current_folder()
 		#self.load_images(self.desired_width ,self.desired_height)
 	
 		
@@ -45,10 +42,13 @@ class image:
 		self.model.clear()
 		self.desired_width = value
 		self.desired_height = value
-		self.on_button1_clicked(self.desired_width,self.desired_height)
-		#self.load_images(self.desired_width,self.desired_height)
-
+		print(self.desired_height)
+		print(self.desired_width)
 		
+		self.on_button1_clicked(self.desired_width,self.desired_height)
+		
+		
+
 	def __init__(self):
 		self.gladefile = "gui.glade"
 		self.builder = gtk.Builder()
