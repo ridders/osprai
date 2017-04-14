@@ -1,39 +1,37 @@
-from PIL import Image
+import cv2
 import os
 import sys
+from multiprocessing import Pool
+from datetime import datetime
 
 # "selection" is the variable handled by the filechooserdialog. It specifies the selected file or path.
 
 def load_images(selection):
-	if os.name == 'nt':
-		file_path = ("{0}\\".format(selection))
-	else:
-		file_path = ("{0}/".format(selection))
+	files = []
+	count = 0
 	
 	if os.path.isdir("temp") == False:
 		os.makedirs("temp")
-		
-		for root, dirs, files in os.walk(selection):
-			count = 0
-			for item in files:
-				count +=1
-				file_ext = item.split('.') 
-				desired_width = 300
-				desired_height = 300
-				
-				output = ("temp/thumbs{0}.{1}".format(count,file_ext[1]))
-				
-				media = Image.open("{0}{1}".format(file_path, item))
-				media = media.resize((desired_width, desired_height), Image.ANTIALIAS)
-				media.save(output)
-				
-		for root, dirs, files in os.walk("temp"):
-			thumbs = files
-			return(thumbs)
-	
 	else:
-		for root, dirs, files in os.walk("temp"):
+		for dirpath,_,filenames in os.walk("temp"):
 			thumbs = files
 			return(thumbs)
+			
+	for dirpath,_,filenames in os.walk(selection):
+		for f in filenames:
+			files.append (os.path.abspath(os.path.join(dirpath, f)))
+
+	for image in files:
+		count+=1
+		size = 300, 300
+		im = cv2.imread(image)
+		resized_image = cv2.resize(im, size)
+		cv2.imwrite("temp/thumbnail_%s.jpg" % count, resized_image) 
+		
+	for dirpath,_,filenames in os.walk("temp"):
+		thumbs = filenames
+		return(thumbs)
+	
+	
 		
 		
