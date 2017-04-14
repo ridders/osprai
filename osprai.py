@@ -15,17 +15,13 @@ class image:
 		print "quit with cancel"
 		gtk.main_quit()
 		
-	def on_button2_clicked(self, widget, data=None):
+	def filechooserdialog_cancel_button_clicked(self, widget, data=None):
 		self.filechooserdialog.hide()	
 	
-	def on_button1_clicked(self, widget, data=None):
+	def filechooserdialog_open_button_clicked(self, widget, data=None):
 		selection = self.filechooserdialog.get_current_folder()
 		self.filechooserdialog.hide()
 		
-		self.thumb_view.set_model(self.model)
-		self.thumb_view.set_pixbuf_column(0)
-		self.thumb_view.set_columns(-1)
-
 		thumbs = folders.load_images(selection)
 		for thumbnail in thumbs:
 		
@@ -33,7 +29,10 @@ class image:
 			pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
 			self.model.append([pixbuf])
 
-	def on_gtk_open_activate(self, menuitem, data=None):
+	def on_file_open_activate(self, menuitem, data=None):
+		self.filechooserdialog.run()
+		
+	def on_file_new_activate(self, menuitem, data=None):
 		self.filechooserdialog.run()
 	
 	def on_adjustment1_changed(self, widget, *argvs):
@@ -43,7 +42,7 @@ class image:
 		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
-		self.on_button1_clicked(self.desired_width,self.desired_height)
+		self.on_file_new_activate(self.desired_width,self.desired_height)
 		
 
 	def __init__(self):
@@ -57,6 +56,10 @@ class image:
 		self.scale = self.builder.get_object('scale1')
 		self.adjustment = self.builder.get_object('adjustment1')
 		self.filechooserdialog = self.builder.get_object("filechooserdialog1")
+		
+		self.thumb_view.set_model(self.model)
+		self.thumb_view.set_pixbuf_column(0)
+		self.thumb_view.set_columns(-1)
 		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
