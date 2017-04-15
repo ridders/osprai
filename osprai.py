@@ -22,6 +22,10 @@ class image:
 		selection = self.filechooserdialog.get_current_folder()
 		self.filechooserdialog.hide()
 		
+		self.thumb_view.set_model(self.model)
+		self.thumb_view.set_pixbuf_column(0)
+		self.thumb_view.set_columns(-1)
+		
 		thumbs = folders.load_images(selection)
 		for thumbnail in thumbs:
 		
@@ -42,7 +46,9 @@ class image:
 		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
-		self.on_file_new_activate(self.desired_width,self.desired_height)
+		print(self.desired_width)
+		print(self.desired_height)
+		self.filechooserdialog_open_button_clicked(self.desired_width,self.desired_height)
 	
 	def iconview_button_press_event(self, iconview, event):
 		if event.button == 3:
@@ -63,9 +69,9 @@ class image:
 		self.filechooserdialog = self.builder.get_object("filechooserdialog1")
 		self.popup = self.builder.get_object("popup")
 		
-		self.thumb_view.set_model(self.model)
-		self.thumb_view.set_pixbuf_column(0)
-		self.thumb_view.set_columns(-1)
+		#self.thumb_view.set_model(self.model)
+		#self.thumb_view.set_pixbuf_column(0)
+		#self.thumb_view.set_columns(-1)
 		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
