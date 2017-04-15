@@ -7,4 +7,4 @@ A work in progress modular open source media categoriser and analysis tool, deve
 
 For those who wish to develop this project on Microsoft Windows, you will require the All-In-One PyGI/PyGObject Installer which can be obtained [here](https://sourceforge.net/projects/pygobjectwin32/files/)
 
-Any development on any of the exisiting modules may also require the OpenCV 2.x library. 
+Development on any of the exisiting modules may also require the OpenCV 2.x library. 
