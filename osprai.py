@@ -12,7 +12,6 @@ from modules import folders
 class image:
 
 	def on_window1_destroy(self, object, data=None):
-		print "quit with cancel"
 		gtk.main_quit()
 		
 	def filechooserdialog_cancel_button_clicked(self, widget, data=None):
@@ -41,21 +40,22 @@ class image:
 	
 	def on_adjustment1_changed(self, widget, *argvs):
 		self.model.clear()
-		#self.desired_width = value
-		#self.desired_height = value
-		
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
-		print(self.desired_width)
-		print(self.desired_height)
 		self.filechooserdialog_open_button_clicked(self.desired_width,self.desired_height)
 	
 	def iconview_button_press_event(self, iconview, event):
 		if event.button == 3:
-			print("WORKING")
+			print("item right clicked")
 			self.popup.popup(None, None, None, None, event.button, event.time)
-
-
+			
+	def iconview_item_activated(self, widget, data=None):
+		print("item double clicked")
+	
+	def iconview_selection_changed(self, widget, data=None):
+		print("item selected")
+		#self.on_item_activated(widget, widget.get_selected_items()[0])
+		
 	def __init__(self):
 		self.gladefile = "gui.glade"
 		self.builder = gtk.Builder()
@@ -68,11 +68,7 @@ class image:
 		self.adjustment = self.builder.get_object('adjustment1')
 		self.filechooserdialog = self.builder.get_object("filechooserdialog1")
 		self.popup = self.builder.get_object("popup")
-		
-		#self.thumb_view.set_model(self.model)
-		#self.thumb_view.set_pixbuf_column(0)
-		#self.thumb_view.set_columns(-1)
-		
+				
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
 		
