@@ -43,7 +43,12 @@ class image:
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
 		self.on_file_new_activate(self.desired_width,self.desired_height)
-		
+	
+	def iconview_button_press_event(self, iconview, event):
+		if event.button == 3:
+			print("WORKING")
+			self.popup.popup(None, None, None, None, event.button, event.time)
+
 
 	def __init__(self):
 		self.gladefile = "gui.glade"
@@ -56,6 +61,7 @@ class image:
 		self.scale = self.builder.get_object('scale1')
 		self.adjustment = self.builder.get_object('adjustment1')
 		self.filechooserdialog = self.builder.get_object("filechooserdialog1")
+		self.popup = self.builder.get_object("popup")
 		
 		self.thumb_view.set_model(self.model)
 		self.thumb_view.set_pixbuf_column(0)
