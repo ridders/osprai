@@ -14,7 +14,7 @@ def load_images(selection):
 		os.makedirs("temp")
 	else:
 		for dirpath,_,filenames in os.walk("temp"):
-			thumbs = files
+			thumbs = filesnames
 			return(thumbs)
 			
 	for dirpath,_,filenames in os.walk(selection):
