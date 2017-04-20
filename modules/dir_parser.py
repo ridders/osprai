@@ -4,6 +4,7 @@ import sys
 import hashlib
 import re
 from datetime import datetime
+from os.path import splitext
 	
 def create_case(selection):	
 	for dirpath,_,filenames in os.walk(selection):
@@ -41,7 +42,8 @@ def create_index_and_thumbs(selection):
 				size = 300, 300
 				im = cv2.imread(item)
 				resized_image = cv2.resize(im, size)
-				thumb_name = ("thumbnail_{0}.jpg".format(total_count))
+				filename,extension = splitext(item)
+				thumb_name = ("thumbnail_{0}{1}".format(total_count,extension))
 				thumbs_path = (os.path.join(thumbs_dir, thumb_name))
 				cv2.imwrite(thumbs_path, resized_image)
 					
