@@ -37,11 +37,16 @@ class image:
 		
 	def load_thumbs(self, selection, width, height):
 		index = (os.path.join(selection, "case.osp", "index.csv"))
+		thumbs_locations = []
 		with open(index, "r") as fo:
 			for line in fo:
 				attribute = (line.split(","))
 				thumbs_path = attribute[2]
-				pixbuf = Pixbuf.new_from_file(thumbs_path)
+				if thumbs_path not in thumbs_locations:
+					thumbs_locations.append(attribute[2])
+				
+			for each in thumbs_locations:
+				pixbuf = Pixbuf.new_from_file(each)
 				pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
 				self.model.append([pixbuf])
 		
@@ -73,9 +78,17 @@ class image:
 	def show_result_activate(self, menuitem, data=None):
 		#print (self.thumb_view.get_selected_items()[0])
 		selected_path = (self.thumb_view.get_selected_items())
-		for f in selected_path:
-			print(f)
-		
+		#for f in selected_path:
+			#print(f)
+		# (pathlist) = self.thumb_view.get_selected_items()
+		# for path in pathlist :
+			# tree_iter = self.model.get_iter(path)
+			# value = self.model.get_value(tree_iter,0)
+			# print value
+
+		self.model, treeiter = 0 
+			
+
 	def __init__(self):
 		self.gladefile = "gui.glade"
 		self.builder = gtk.Builder()
