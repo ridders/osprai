@@ -8,6 +8,28 @@ from gi.repository import Gdk as gdk
 from gi.repository.GdkPixbuf import Pixbuf
 from gi.repository import GdkPixbuf, Gdk
 from modules import dir_parser
+from time import gmtime, strftime
+from multiprocessing.dummy import Pool as ThreadPool
+from functools import partial
+
+# Moved here in preparation for multiprocessing
+#~ def initial_thumbs_load(self, selection, width, height, row):
+	#~ print("creating thumbs for gallery view...")
+	#~ print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+		
+	#~ print(row)
+	
+	#~ items = (row.split(","))
+	#~ thumb_loc = items[1]
+	#~ file_loc = items[2]
+	#~ dir_parser.thumbs_generator(file_loc, thumb_loc)
+	#~ pixbuf = Pixbuf.new_from_file(thumb_loc)
+	#~ pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+	#~ self.model.append([pixbuf, thumb_loc])
+				
+	#~ print("thumbs created!")
+	#~ print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+	
 
 class image:
 	
@@ -18,10 +40,13 @@ class image:
 		self.filechooserdialog.hide()	
 	
 	def filechooserdialog_open_button_clicked(self, widget, data=None):
-		self.selection = self.filechooserdialog.get_current_folder()
+		#self.selection = self.filechooserdialog.get_current_folder()
+		self.selection = self.filechooserdialog.get_filename() # GUI updated too, this fixes folder selection
+		print(self.selection)
 		dir_parser.create_case(self.selection)
 		
-		total_count, uniques = dir_parser.create_index_and_thumbs(self.selection)
+		total_count, uniques, index_file = dir_parser.create_index_and_thumbs(self.selection)
+		self.temp_index = index_file
 		self.total_count.set_text(str(total_count))
 		self.total_unique.set_text(str(uniques))
 		self.filechooserdialog.hide()
@@ -33,22 +58,30 @@ class image:
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
 		
-		self.load_thumbs(self.selection,self.desired_width,self.desired_height)
+		self.initial_thumbs_load(self.selection,self.desired_width,self.desired_height)
+
+		#In preparation for multiprocessing
+		#partial_harvester = partial(initial_thumbs_load,self.selection,self.desired_width,self.desired_height, row)
+		#pool = ThreadPool(4)
+		#results = pool.map(partial_harvester, self.temp_index[:20])
+		#pool.close()
+		#pool.join() 
 		
-	def load_thumbs(self, selection, width, height):
-		index = (os.path.join(selection, "case.osp", "index.csv"))
-		thumbs_locations = []
-		with open(index, "r") as fo:
-			for line in fo:
-				attribute = (line.split(","))
-				thumbs_path = attribute[2]
-				if thumbs_path not in thumbs_locations:
-					thumbs_locations.append(attribute[2])
+	def initial_thumbs_load(self, selection, width, height):		
+		print("creating thumbs for gallery view...")
+		print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 				
-			for each in thumbs_locations:
-				pixbuf = Pixbuf.new_from_file(each)
-				pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
-				self.model.append([pixbuf])
+		for row in self.temp_index[:20]:
+			items = (row.split(",")) # Need a better name for the row split
+			thumb_loc = items[1]
+			file_loc = items[2]
+			dir_parser.thumbs_generator(file_loc, thumb_loc)
+			pixbuf = Pixbuf.new_from_file(thumb_loc)
+			pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+			self.model.append([pixbuf, thumb_loc])
+				
+		print("thumbs created!")
+		print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 		
 	def on_file_open_activate(self, menuitem, data=None):
 		self.filechooserdialog.run()
@@ -60,8 +93,8 @@ class image:
 		self.model.clear()
 		self.desired_width = self.adjustment.get_value()
 		self.desired_height = self.adjustment.get_value()
-		self.load_thumbs(self.selection,self.desired_width,self.desired_height)
-
+		self.initial_thumbs_load(self.selection,self.desired_width,self.desired_height)
+		# Revamp initial_thumbs_load function with hyper theading and thumb existance checking
 				
 	def iconview_button_press_event(self, iconview, event):
 		if event.button == 3:
@@ -75,20 +108,69 @@ class image:
 		print("item selected")
 		
 		
-	def show_result_activate(self, menuitem, data=None):
-		#print (self.thumb_view.get_selected_items()[0])
-		selected_path = (self.thumb_view.get_selected_items())
-		#for f in selected_path:
-			#print(f)
-		# (pathlist) = self.thumb_view.get_selected_items()
-		# for path in pathlist :
-			# tree_iter = self.model.get_iter(path)
-			# value = self.model.get_value(tree_iter,0)
-			# print value
-
-		self.model, treeiter = 0 
+	def show_result_activate(self, menuitem, data=None): # This is a temporary feature to monitor the index results
+		# for each in self.thumb_view.get_selected_items():
+			# path = gtk.TreePath(each)
+			# treeiter = self.model.get_iter(path)
+			#Get value at 2nd column
+			# value = self.model.get_value(treeiter, 1)
+			for row in self.temp_index:
+				print(row).strip("\n")
+		
+	def on_iconview_key_press_event(self, widget, event):
+		to_remove = []
+	
+		if event.keyval == 56:
+			print("Key Eight has been pressed")
 			
+			for row in (self.temp_index):
+				row_elements = row.split(",")
 
+				for each in self.thumb_view.get_selected_items():
+					path = gtk.TreePath(each) # thumb position (numeric value) within the gallery view
+					treeiter = self.model.get_iter(path)
+					value = self.model.get_value(treeiter, 1) # thumbnail path
+
+					if value == row_elements[1] and row_elements[3] == "0":
+						print("match found")
+						print(row)
+						to_remove.append(row) #takes a snaptshot of the row, adds to to_remove list for interation and removal from self.temp_index later
+						rep_str = (row)
+						rep_str = rep_str.split(",") # prepares original row for category replacement
+						new_str_seq = (rep_str[0],rep_str[1],rep_str[2],"8")
+						rep_str = ",".join(new_str_seq)
+						print(rep_str)
+						self.temp_index.append(rep_str)
+					
+			for row in self.temp_index[:]:
+				row_elements = row.split(",")
+				for each in to_remove:
+					if each == row:
+						self.temp_index.remove(row)
+						print("row removed")
+			print("temp index updated")
+			to_remove[:] = []
+			self.model.clear()
+			
+			print("Building new thumbs!") # This takes too long, probably overwriting existing thumbs if present... sort this
+			print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+			for line in self.temp_index[:20]:
+				attribute = (line.split(","))
+				thumb_loc = attribute[1]
+				file_loc = attribute[2]
+				category = attribute[3]
+				if category == '0':
+					#if os.path.isfile(thumb_loc) == False: # !!!RESEARCH REQUIRED TO LOAD EXISTING FILE
+					dir_parser.thumbs_generator(file_loc, thumb_loc)
+					pixbuf = Pixbuf.new_from_file(thumb_loc)
+					pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+					self.model.append([pixbuf, thumb_loc])
+					#else:
+						#pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+						#self.model.append(thumb_loc)
+			print("new thumbs created!")
+			print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+				
 	def __init__(self):
 		self.gladefile = "gui.glade"
 		self.builder = gtk.Builder()
@@ -103,7 +185,10 @@ class image:
 		self.popup = self.builder.get_object("popup")
 		self.total_count = self.builder.get_object("label36")
 		self.total_unique = self.builder.get_object("label35")
-		self.selection = ""	
+		
+		self.selection = ""
+		self.temp_index = []
+		
 		self.window.maximize()
 		self.window.show()
 		self.window.show_all()
