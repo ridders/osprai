@@ -75,10 +75,12 @@ class image:
 			items = (row.split(",")) # Need a better name for the row split
 			thumb_loc = items[1]
 			file_loc = items[2]
-			dir_parser.thumbs_generator(file_loc, thumb_loc)
-			pixbuf = Pixbuf.new_from_file(thumb_loc)
-			pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
-			self.model.append([pixbuf, thumb_loc])
+			category = items[3]
+			if category == '0':
+				dir_parser.thumbs_generator(file_loc, thumb_loc)
+				pixbuf = Pixbuf.new_from_file(thumb_loc)
+				pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+				self.model.append([pixbuf, thumb_loc])
 				
 		print("thumbs created!")
 		print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
@@ -119,9 +121,11 @@ class image:
 		
 	def on_iconview_key_press_event(self, widget, event):
 		to_remove = []
-	
-		if event.keyval == 56:
-			print("Key Eight has been pressed")
+		cats = {48: 0, 49: 1, 50: 2, 51: 3, 52: 4, 53: 5, 54: 6, 55: 7, 56: 8, 57: 9}
+		#What do cats use to make coffee? A purrcolator.
+		
+		if event.keyval in cats:
+			print("Key {0} has been pressed".format(cats[event.keyval]))
 			
 			for row in (self.temp_index):
 				row_elements = row.split(",")
@@ -137,7 +141,7 @@ class image:
 						to_remove.append(row) #takes a snaptshot of the row, adds to to_remove list for interation and removal from self.temp_index later
 						rep_str = (row)
 						rep_str = rep_str.split(",") # prepares original row for category replacement
-						new_str_seq = (rep_str[0],rep_str[1],rep_str[2],"8")
+						new_str_seq = (rep_str[0],rep_str[1],rep_str[2],str(cats[event.keyval]))
 						rep_str = ",".join(new_str_seq)
 						print(rep_str)
 						self.temp_index.append(rep_str)
