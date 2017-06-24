@@ -25,5 +25,7 @@ You can install OpenCV from the Ubuntu or Debian repository via the command: sud
 ###### OSX
 Yet to be tested.
 
+## Sample Data:
+It is accepted that developers may require large sample datasets for development. Refer to "sample_data.py" for a simple script that crawls NASA's Astronomy Picture of the Day archive and downloads the images. The author of this code is [Cecil Woebker](https://github.com/cwoebker)
 
 
