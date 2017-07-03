@@ -37,15 +37,13 @@ def create_index_and_thumbs(selection):
 				thumb_name = ("thumbnail_{0}{1}".format(total_count,extension))
 				thumbs_path = (os.path.join(thumbs_dir, thumb_name))
 				xx = xxhash.xxh64(open(file_path, 'rb').read()).hexdigest() # !!! Stanity Check !!! does this work?
-				if xx not in hashes:
-					hashes.append(xx)
-
+				hashes.append(xx)
 			index_file.append("{0},{1},{2},{3}".format(xx,thumbs_path,file_path,category))
 			
 
 	print("completed populating virtual index")
 	print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-	uniques = (len(hashes))
+	uniques = (len(set(hashes)))
 	return(total_count, uniques, index_file)
 
 def thumbs_generator(file_loc, thumb_loc):
