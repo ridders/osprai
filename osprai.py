@@ -1,3 +1,4 @@
+#!python2
 import gi
 gi.require_version('Gtk', '3.0')
 import os
@@ -25,7 +26,6 @@ def thumbs_scale(row, selection, width, height):
     items = (row.split(","))
     thumb_loc = items[1]
     file_loc = items[2]
-    #dir_parser.thumbs_generator(file_loc, thumb_loc)
     pixbuf = Pixbuf.new_from_file(thumb_loc)
     pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.HYPER)
     return [pixbuf, thumb_loc]
@@ -43,9 +43,15 @@ class image:
         self.scale = self.builder.get_object('scale1')
         self.adjustment = self.builder.get_object('adjustment1')
         self.filechooserdialog = self.builder.get_object("filechooserdialog1")
-        self.popup = self.builder.get_object("popup")
-        self.total_count = self.builder.get_object("label36")
-        self.total_unique = self.builder.get_object("label35")
+        self.import_prep_window = self.builder.get_object("window2")
+        self.import_settings = self.builder.get_object("window2")
+        self.import_settings.set_size_request(300,200)
+        self.popup = self.builder.get_object("popup") #what is this?
+        self.import_dir_button = self.builder.get_object('button12')
+        self.import_xml_button = self.builder.get_object('button11')
+        #self.total_count = self.builder.get_object("label36")
+        #self.total_unique = self.builder.get_object("label35")
+        self.status = self.builder.get_object("label26")
         self.not_done_count = self.builder.get_object("label34")
         self.not_done_unique = self.builder.get_object("label33")
         self.selection = ""
@@ -57,20 +63,24 @@ class image:
 
     def on_window1_destroy(self, object, data=None):
         gtk.main_quit()
-
+        
     def filechooserdialog_cancel_button_clicked(self, widget, data=None):
         self.filechooserdialog.hide()
 
     def filechooserdialog_open_button_clicked(self, widget, data=None):
+        #self.import_prep_window.grab_focus()
+        self.import_xml_button.set_sensitive(False)
+        self.status.set_text(str("Calculating"))
         #self.selection = self.filechooserdialog.get_current_folder()
         self.selection = self.filechooserdialog.get_filename() # GUI updated too, this fixes folder selection
-        print(self.selection)
-        dir_parser.create_case(self.selection)
-
-        total_count, uniques, index_file = dir_parser.create_index_and_thumbs(self.selection)
+        self.filechooserdialog.hide()
+        status = dir_parser.create_case(self.selection)
+        
+        self.status.set_text(str("importing {0} files".format(status)))
+        index_file = dir_parser.create_index_and_thumbs(self.selection)
         self.temp_index = index_file
-        self.total_count.set_text(str(total_count))
-        self.total_unique.set_text(str(uniques))
+        #self.total_count.set_text(str(total_count))
+        #self.total_unique.set_text(str(uniques))
         self.filechooserdialog.hide()
 
         self.thumb_view.set_model(self.model)
@@ -83,18 +93,21 @@ class image:
         print("creating thumbs for gallery view...")
         print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         partial_harvester = partial(initial_thumbs_load,selection=self.selection,width=self.desired_width,height=self.desired_height)
-        pool = ThreadPool(6)
-        image_list = pool.map(partial_harvester, self.temp_index[:20])
+        pool = ThreadPool(3)
+        #pool = multiprocessing.Semaphore(multiprocessing.cpu_count()) 
+        image_list = pool.map(partial_harvester, self.temp_index[:40])
         pool.close()
         pool.join()
         
         for item in image_list:
-			#print(item)
-			self.model.append(item)
-		
+            #print(item)
+            self.model.append(item)
+        
         print("Finished creating thumbs!")
         print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-
+		
+        self.import_prep_window.grab_focus() # This does not appear to be drawing focus back to the import prep window
+        #self.status.set_text(str("Import Complete"))
     #~ def category_checker(self):
 
         #~ cat_count = {
@@ -109,15 +122,14 @@ class image:
             #~ category = items[3]
             #~ #category.append(xx_hash)
             #~ cat_count[category].get(category, category) += 1
-
-         
-      
-        
-    def on_file_open_activate(self, menuitem, data=None):
+	
+    def on_import_dir_clicked(self, widget, data=None):
         self.filechooserdialog.run()
-        
+        #self.import_xml_button.set_sensitive(False)
+		
     def on_file_new_activate(self, menuitem, data=None):
-        self.filechooserdialog.run()
+        
+        self.import_settings.show()    #In progress but works
     
     def on_adjustment1_changed(self, widget,*argvs):
         self.model.clear()
@@ -125,13 +137,13 @@ class image:
         self.desired_height = self.adjustment.get_value()
      
         partial_harvester = partial(thumbs_scale,selection=self.selection,width=self.desired_width,height=self.desired_height)
-        pool = ThreadPool(6)
-        image_list = pool.map(partial_harvester, self.temp_index[:20])
+        pool = ThreadPool(3)
+        image_list = pool.map(partial_harvester, self.temp_index[:40])
         pool.close()
         pool.join()
         
         for item in image_list:
-			self.model.append(item)
+            self.model.append(item)
 
                 
     def iconview_button_press_event(self, iconview, event):
@@ -156,7 +168,7 @@ class image:
             #for row in self.temp_index:
                 #print(row).strip("\n")
             
-        #category_checker()
+        category_checker()
         
         
     def on_iconview_key_press_event(self, widget, event):
@@ -178,7 +190,7 @@ class image:
                     if value == row_elements[1] and row_elements[3] == "0":
                         print("match found")
                         print(row)
-                        to_remove.append(row) #takes a snaptshot of the row, adds to to_remove list for interation and removal from self.temp_index later
+                        to_remove.append(row) #takes a snaptshot of the row, adds to to_remove list for iteration and removal from self.temp_index later
                         rep_str = (row)
                         rep_str = rep_str.split(",") # prepares original row for category replacement
                         new_str_seq = (rep_str[0],rep_str[1],rep_str[2],str(cats[event.keyval]))
@@ -198,20 +210,20 @@ class image:
             
             print("Building new thumbs!") # This takes too long, probably overwriting existing thumbs if present... sort this
             print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-            for line in self.temp_index[:20]:
+            for line in self.temp_index[:40]:
                 attribute = (line.split(","))
                 thumb_loc = attribute[1]
                 file_loc = attribute[2]
                 category = attribute[3]
-                if category == '0':
-                    #if os.path.isfile(thumb_loc) == False: # !!!RESEARCH REQUIRED TO LOAD EXISTING FILE
-                    dir_parser.thumbs_generator(file_loc, thumb_loc)
-                    pixbuf = Pixbuf.new_from_file(thumb_loc)
-                    pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
-                    self.model.append([pixbuf, thumb_loc])
-                    #else:
-                        #pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
-                        #self.model.append(thumb_loc)
+                #if category == '0' and os.path.isfile(thumb_loc) == False: # !!!RESEARCH REQUIRED TO LOAD EXISTING FILE
+                    #print("thumb does not exist")
+                dir_parser.thumbs_generator(file_loc, thumb_loc)
+                pixbuf = Pixbuf.new_from_file(thumb_loc)
+                pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+                self.model.append([pixbuf, thumb_loc])
+                #else:
+                    #pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+                    #self.model.append(thumb_loc) # testing
             print("new thumbs created!")
             print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
                 
@@ -220,3 +232,20 @@ class image:
 if __name__ == "__main__":
     main = image()
     gtk.main()
+
+	
+	        # print("creating thumbs for gallery view...")
+        # print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+        # partial_harvester = partial(initial_thumbs_load,selection=self.selection,width=self.desired_width,height=self.desired_height)
+        # pool = ThreadPool(3)
+        #pool = multiprocessing.Semaphore(multiprocessing.cpu_count()) 
+        # image_list = pool.map(partial_harvester, self.temp_index[:40])
+        # pool.close()
+        # pool.join()
+        
+        # for item in image_list:
+            #print(item)
+            # self.model.append(item)
+        
+        # print("Finished creating thumbs!")
+        # print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
