@@ -7,10 +7,6 @@ import hashlib
 import re
 from time import gmtime, strftime
 from os.path import splitext
-try:
-    from os import scandir, walk
-except ImportError:
-    from scandir import scandir, walk
 
 def create_case(selection):	# Althought not vital now, keep this for later when saving changes to file
     status = 0
@@ -31,6 +27,23 @@ def create_case(selection):	# Althought not vital now, keep this for later when 
     print("initial scan complete")
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 			#add a return of the files in here somewhere
+			
+def import_prep(selection):
+	hashes = []
+	total_count = 0
+	extensions = ('.jpeg', '.jpg', '.png', '.gif')
+	for root,dirpath,filenames in os.walk(selection):
+		for item in filenames:
+			filename,extension = splitext(item)
+			if extension in extensions:
+				total_count+=1
+				file_path = (os.path.join(os.path.abspath(root),item))
+				#print(file_path)
+				#thumb_name = ("thumbnail_{0}{1}".format(total_count,extension))
+				#thumbs_path = (os.path.join(thumbs_dir, thumb_name))
+				#xx = hash_file(file_path)
+	return(total_count)
+	
 
 def create_index_and_thumbs(selection):
 	total_count = 0 #Quantity of media including ducplicates. This is being used as the unqiue ID for IconView
