@@ -19,18 +19,20 @@ def initial_thumbs_load(row, selection, width, height):
 	file_loc = items[2]
 	dir_parser.thumbs_generator(file_loc, thumb_loc)
 	pixbuf = Pixbuf.new_from_file(thumb_loc)
-	pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.HYPER)
+	pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR) #BILINEAR, HYPER, TILES, NEAREST
 	return [pixbuf, thumb_loc]
 	
 def thumbs_scale(row, selection, width, height):
 	items = (row.split(","))
 	thumb_loc = items[1]
 	file_loc = items[2]
+	category = items[3]
+	#if category == 0: # Only relevant to the 'Not done' category, will be required to be modified when other cats are viewable
 	pixbuf = Pixbuf.new_from_file(thumb_loc)
-	pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.HYPER)
+	pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
 	return [pixbuf, thumb_loc]
 
-
+	
 class image:
 	def __init__(self):
 		self.gladefile = "gui.glade"
@@ -225,13 +227,13 @@ class image:
 					print("thumb does not exist")
 					dir_parser.thumbs_generator(file_loc, thumb_loc)
 					pixbuf = Pixbuf.new_from_file(thumb_loc)
-					pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+					pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.BILINEAR)
 					self.model.append([pixbuf, thumb_loc])
 
 				elif category == '0' and os.path.isfile(thumb_loc) == True:
 					print("thumb does exist")
 					pixbuf = Pixbuf.new_from_file(thumb_loc)
-					pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.HYPER)
+					pixbuf = pixbuf.scale_simple(self.desired_width, self.desired_height, GdkPixbuf.InterpType.BILINEAR)
 					self.model.append([pixbuf, thumb_loc])
 			print("new thumbs created!")
 			print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
