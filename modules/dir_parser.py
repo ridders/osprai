@@ -53,7 +53,7 @@ def create_index_and_thumbs(selection):
 	case_dir = (os.path.join(selection, "case.osp"))
 	thumbs_dir = (os.path.join(case_dir, "thumbs"))
 	#index = (os.path.join(selection, "case.osp", "index.csv"))
-	index_file = [] #Replacement to above
+	index_file = set() #Replacement to above
 
 	print("commencing the population of virtual index")
 	print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
@@ -72,11 +72,8 @@ def create_index_and_thumbs(selection):
 				#print(xx)
 				#if xx not in hashes:
 					#hashes.append(xx)
-			
-			
+			index_file.add("{0},{1},{2},{3}".format(xx,thumbs_path,file_path,category))
 
-			index_file.append("{0},{1},{2},{3}".format(xx,thumbs_path,file_path,category))
-			
 
 	print("completed populating virtual index")
 	print(total_count)
@@ -95,7 +92,7 @@ def hash_file(file_path, block_size=256 * 128):
         return hasher.hexdigest()
 
 def thumbs_generator(file_loc, thumb_loc):
-	print(file_loc)
+	#print(file_loc)
 	im = cv2.imread(file_loc)
 	r = 100.0 / im.shape[1]
 	dim = (100, int(im.shape[0] * r))
