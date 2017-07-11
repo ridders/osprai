@@ -27,7 +27,6 @@ def thumbs_scale(row, selection, width, height):
 	thumb_loc = items[1]
 	file_loc = items[2]
 	category = items[3]
-	print(category)
 	if category == "0": # Only relevant to the 'Not done' category, will be required to be modified when other cats are viewable
 		pixbuf = Pixbuf.new_from_file(thumb_loc)
 		pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
