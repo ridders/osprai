@@ -27,12 +27,12 @@ def thumbs_scale(row, selection, width, height):
 	thumb_loc = items[1]
 	file_loc = items[2]
 	category = items[3]
-	#if category == 0: # Only relevant to the 'Not done' category, will be required to be modified when other cats are viewable
-	pixbuf = Pixbuf.new_from_file(thumb_loc)
-	pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
-	return [pixbuf, thumb_loc]
+	print(category)
+	if category == "0": # Only relevant to the 'Not done' category, will be required to be modified when other cats are viewable
+		pixbuf = Pixbuf.new_from_file(thumb_loc)
+		pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
+		return [pixbuf, thumb_loc]
 
-	
 class image:
 	def __init__(self):
 		self.gladefile = "gui.glade"
@@ -99,7 +99,7 @@ class image:
 		print("creating thumbs for gallery view...")
 		print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 		partial_harvester = partial(initial_thumbs_load,selection=self.selection,width=self.desired_width,height=self.desired_height)
-		pool = ThreadPool(3)
+		pool = ThreadPool(1)
 		#pool = multiprocessing.Semaphore(multiprocessing.cpu_count()) 
 		image_list = pool.map(partial_harvester, self.temp_index[:40])
 		pool.close()
@@ -143,7 +143,7 @@ class image:
 		self.desired_height = self.adjustment.get_value()
 	 
 		partial_harvester = partial(thumbs_scale,selection=self.selection,width=self.desired_width,height=self.desired_height)
-		pool = ThreadPool(3)
+		pool = ThreadPool(1)
 		image_list = pool.map(partial_harvester, self.temp_index[:40])
 		pool.close()
 		pool.join()
