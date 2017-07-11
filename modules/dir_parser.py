@@ -72,7 +72,7 @@ def create_index_and_thumbs(selection):
 				#print(xx)
 				#if xx not in hashes:
 					#hashes.append(xx)
-			index_file.add("{0},{1},{2},{3}".format(xx,thumbs_path,file_path,category))
+				index_file.add("{0},{1},{2},{3}".format(xx,thumbs_path,file_path,category))
 
 
 	print("completed populating virtual index")
