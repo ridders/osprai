@@ -27,13 +27,13 @@ To develop on MacOS you must first install the Homebrew package manager for MacO
 
 You will then need to use homebrew and pip to install the following packages (tested using MacOS 10.12 - Sierra), the commands are listed as follows (the system may need to be restarted before running Osprai):
 
-brew install gtk+3
-brew install pygobject3
-brew tap homebrew/science
-brew install opencv
-pip install numpy
-brew install xxhash
-pip install xxhash
+- brew install gtk+3
+- brew install pygobject3
+- brew tap homebrew/science
+- brew install opencv
+- pip install numpy
+- brew install xxhash
+- pip install xxhash
 
 ## Sample Data:
 It is accepted that developers may require large sample datasets for development. Refer to "sample_data.py" for a simple script that crawls NASA's Astronomy Picture of the Day archive and downloads the images. The author of this code is [Cecil Woebker](https://github.com/cwoebker)
