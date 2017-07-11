@@ -83,11 +83,8 @@ class image:
 
 	def import_prep_apply_clicked(self, widget, data=None):	
 		dir_parser.create_case(self.selection)
-		#self.status.set_text(str("importing {0} files".format(status)))
 		index_file = dir_parser.create_index_and_thumbs(self.selection)
-		self.temp_index = index_file
-		#self.total_count.set_text(str(total_count))
-		#self.total_unique.set_text(str(uniques))
+		self.temp_index = list(index_file)
 		self.filechooserdialog.hide()
 
 		self.thumb_view.set_model(self.model)
@@ -165,15 +162,15 @@ class image:
 		print("item selected")
 		
 		
-	#def show_result_activate(self, menuitem, data=None): # This is a temporary feature to monitor the index results
+	def show_result_activate(self, menuitem, data=None): # This is a temporary feature to monitor the index results
 		# for each in self.thumb_view.get_selected_items():
 			# path = gtk.TreePath(each)
 			# treeiter = self.model.get_iter(path)
 			#Get value at 2nd column
 			# value = self.model.get_value(treeiter, 1)
 			
-			#for row in self.temp_index:
-				#print(row).strip("\n")
+			for row in self.temp_index:
+				print(row).strip("\n")
 			
 		#category_checker()
 		
